@@ -10,3 +10,7 @@ module "network" {
     owner_tag = var.owner_tag
     prefix    = var.prefix 
 }
+/*
+module "web-server-cluster" {
+    source = "../../modules/services/web-server-cluster"
+}*/
