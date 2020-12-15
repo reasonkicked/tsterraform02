@@ -90,6 +90,7 @@ resource "aws_eip" "eip_01" {
  tags = {
     Environment = var.environment_tag
     Name = "${var.prefix}-${terraform.workspace}-eip_01"
+    Description = "eip for NAT GW"
   }
 }
 resource "aws_eip" "eip_02" {
@@ -97,6 +98,7 @@ resource "aws_eip" "eip_02" {
  tags = {
     Environment = var.environment_tag
     Name = "${var.prefix}-${terraform.workspace}-eip_02"
+    Description = "eip for NAT GW"
   }
 }
 resource "aws_eip" "eip_03" {
@@ -114,6 +116,7 @@ resource "aws_nat_gateway" "nat_gw_01" {
    tags = {
     Environment = var.environment_tag
     Name = "${var.prefix}-${terraform.workspace}-nat_gw_01"
+    Description = "NAT GW in subnet01"
   }
 
 }
@@ -124,13 +127,14 @@ resource "aws_nat_gateway" "nat_gw_02" {
     tags = {
     Environment = var.environment_tag
     Name = "${var.prefix}-${terraform.workspace}-nat_gw_02"
+    Description = "NAT GW in subnet02"
   }
 
  
 }
 
 resource "aws_route_table" "rtb_01" {
-  //depends_on = [aws_nat_gateway.nat_gw_01 ]
+  
   vpc_id = aws_vpc.vpc_01.id
 route {
       cidr_block = "0.0.0.0/0"
@@ -142,7 +146,7 @@ route {
   }
 }
 resource "aws_route_table" "rtb_02" {
-  //depends_on = [aws_nat_gateway.nat_gw_02  ]
+ 
   vpc_id = aws_vpc.vpc_01.id
 route {
       cidr_block = "0.0.0.0/0"
@@ -154,34 +158,60 @@ route {
   }
 }
 
+resource "aws_route_table" "rtb_public_1" {
+  vpc_id = aws_vpc.vpc_01.id
+route {
+      cidr_block = "0.0.0.0/0"
+      gateway_id = aws_internet_gateway.igw_01.id
+  }
+tags = {
+    Environment = var.environment_tag
+    Name = "${var.prefix}-${terraform.workspace}-rtb_public_1"
+   
+  }
+}
+resource "aws_route_table" "rtb_public_2" {
+  vpc_id = aws_vpc.vpc_01.id
+route {
+      cidr_block = "0.0.0.0/0"
+      gateway_id = aws_internet_gateway.igw_01.id
+  }
+tags = {
+    Environment = var.environment_tag
+    Name = "${var.prefix}-${terraform.workspace}-rtb_public_2"
+   
+  }
+}
+
 resource "aws_route_table_association" "subnet_01_rta" {
   subnet_id      = aws_subnet.subnet_01.id
-  route_table_id = aws_route_table.rtb_01.id
+  route_table_id = aws_route_table.rtb_public_1.id
 }
 resource "aws_route_table_association" "subnet_02_rta" {
   subnet_id      = aws_subnet.subnet_02.id
-  route_table_id = aws_route_table.rtb_02.id
+  route_table_id = aws_route_table.rtb_public_2.id
 }
 resource "aws_route_table_association" "subnet_03_rta" {
   subnet_id      = aws_subnet.subnet_03.id
-  route_table_id = aws_route_table.rtb_01.id
+  route_table_id = aws_route_table.rtb_public_1.id
 }
 resource "aws_route_table_association" "subnet_04_rta" {
   subnet_id      = aws_subnet.subnet_04.id
-  route_table_id = aws_route_table.rtb_02.id
+  route_table_id = aws_route_table.rtb_public_2.id
 }
 resource "aws_route_table_association" "subnet_05_rta" {
   subnet_id      = aws_subnet.subnet_05.id
-  route_table_id = aws_route_table.rtb_01.id
+  route_table_id = aws_route_table.rtb_public_1.id
 }
 resource "aws_route_table_association" "subnet_06_rta" {
   subnet_id      = aws_subnet.subnet_06.id
-  route_table_id = aws_route_table.rtb_02.id
+  route_table_id = aws_route_table.rtb_public_2.id
 }
 resource "aws_security_group" "security_group_01" {
   name = "security_group_01"
   vpc_id = aws_vpc.vpc_01.id
   # Allow inbound HTTP requests
+  
   ingress {
     from_port   = 22
     to_port     = 22
@@ -200,6 +230,8 @@ resource "aws_security_group" "security_group_01" {
    tags = {
     Environment = var.environment_tag
     Name = "${var.prefix}-${terraform.workspace}-security_group_01"
+    Description = "22"
+    
   }
 }
 resource "aws_security_group" "security_group_02" {
@@ -224,6 +256,7 @@ resource "aws_security_group" "security_group_02" {
    tags = {
     Environment = var.environment_tag
     Name = "${var.prefix}-${terraform.workspace}-security_group_02"
+    Description = "80"
   }
 }
 resource "aws_security_group" "security_group_03" {
@@ -248,6 +281,7 @@ resource "aws_security_group" "security_group_03" {
    tags = {
     Environment = var.environment_tag
     Name = "${var.prefix}-${terraform.workspace}-security_group_03"
+    Description = "443"
   }
 }
 resource "aws_security_group" "security_group_04" {
@@ -271,5 +305,6 @@ resource "aws_security_group" "security_group_04" {
    tags = {
     Environment = var.environment_tag
     Name = "${var.prefix}-${terraform.workspace}-security_group_04"
+    Description = "3306"
   }
 }

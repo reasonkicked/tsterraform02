@@ -11,4 +11,5 @@ terraform {
     dynamodb_table = "tsterraform02-dynamodb"
     encrypt        = true
   }
+  
 }
