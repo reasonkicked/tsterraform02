@@ -82,12 +82,12 @@ module "web_server_cluster_01" {
   //listener rule 2
 
   //target group attachment
-  target_group_arn = module.alb_target_group_02.alb_target_group_arn
+  //target_group_arn = module.alb_target_group_02.alb_target_group_arn
   target_id        = module.ec2_write_node_primary.ec2_instance_id
-  port             = 80
+  
   
 
-/*
+
     project_name = var.project_name
     environment_tag = var.environment_tag
     owner_tag = var.owner_tag

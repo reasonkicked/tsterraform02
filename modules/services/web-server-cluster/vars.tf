@@ -79,9 +79,7 @@ variable "listener_message_body" {
 variable "listener_status_code" {
   default = 404
 }
-variable "target_group_arn" {
- 
-}
+
 variable "target_id" {
  
 }

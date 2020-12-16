@@ -6,6 +6,36 @@ resource "aws_eip" "eip" {
     Name = "${var.prefix}-${terraform.workspace}-ec2-write-node"
   }
 }
+resource "aws_iam_role" "iam_role_s3_full_access" {
+  name = "iam_role_s3_full_access"
+
+ assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "",
+      "Effect": "Allow",
+      "Principal": {
+        "Service": [
+          "ec2.amazonaws.com"
+        ]
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+EOF
+}
+resource "aws_iam_role_policy_attachment" "ec2-read-only-policy-attachment" {
+    role = aws_iam_role.iam_role_s3_full_access.id
+    policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+}
+
+resource "aws_iam_instance_profile" "iam_role_s3_instance_profile_s3" {
+  name  = "iam_role_s3_instance_profile_s3"
+  role = aws_iam_role.iam_role_s3_full_access.id
+}
 resource "aws_instance" "ec2_instance" {
   ami           = var.instance_ami
   instance_type = var.instance_type
