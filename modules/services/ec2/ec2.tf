@@ -1,3 +1,11 @@
+resource "aws_eip" "eip" {
+ vpc = true  
+ instance = aws_instance.ec2_instance.id
+ tags = {
+    Environment = var.environment_tag
+    Name = "${var.prefix}-${terraform.workspace}-ec2-write-node"
+  }
+}
 resource "aws_instance" "ec2_instance" {
   ami           = var.instance_ami
   instance_type = var.instance_type

@@ -16,12 +16,13 @@ module "ec2_key_pair_01" {
   public_key_path = "~/.ssh/id_rsa.pub"
 }
 
+
 module "ec2_write_node_primary" {
-    depends_on = [ module.network, module.ec2_key_pair_01 ]
+    depends_on = [ module.network, module.ec2_key_pair_01, module.cdn_01 ]
     source = "../../modules/services/ec2"
     instance_ami = "ami-0e472933a1395e172"
     instance_type = "t2.micro"
-    subnet_for_ec2 = module.network.subnet_01_id
+    subnet_for_ec2 = module.network.subnet_03_id
   
     key_pair_for_ec2 = module.ec2_key_pair_01.key_pair_name
     security_groups_for_ec2 = [
@@ -34,13 +35,13 @@ module "ec2_write_node_primary" {
     owner_tag = var.owner_tag
     prefix    = var.prefix 
 }
-
+/*
 module "web_server_cluster_01" {
     source = "../../modules/services/web-server-cluster"
-     depends_on = [ module.network]
+     depends_on = [ module.network, module.ec2_key_pair_01, module.cdn_01, module.ec2_write_node_primary]
 
     //launch configuration
-    instance_ami = "ami-0f7e3927cee806b59" //custom read node ami
+    instance_ami = "ami-0e472933a1395e172" //custom read node ami
     instance_type = "t2.micro"
     key_pair_for_ec2 = module.ec2_key_pair_01.key_pair_name
     security_groups_for_ec2 = [
@@ -81,18 +82,18 @@ module "web_server_cluster_01" {
   //listener rule 2
 
   //target group attachment
-  /*target_group_arn = module.alb_target_group_02.alb_target_group_arn
+  target_group_arn = module.alb_target_group_02.alb_target_group_arn
   target_id        = module.ec2_write_node_primary.ec2_instance_id
   port             = 80
-  */
+  
 
-
+/*
     project_name = var.project_name
     environment_tag = var.environment_tag
     owner_tag = var.owner_tag
     prefix    = var.prefix 
 }
-
+*/
 module "rds_db_instance_01" {
   source = "../../modules/data-stores/rds-db-instance"
   depends_on = [ module.network ]

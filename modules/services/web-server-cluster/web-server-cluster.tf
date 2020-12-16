@@ -184,10 +184,9 @@ resource "aws_lb_listener_rule" "alb_lr_02" {
  }
 
 }
-/*
+
 resource "aws_lb_target_group_attachment" "albtg_attachment" {
   target_group_arn = var.target_group_arn
   target_id        = var.target_id
-  port             = var.port
+  
 }
-*/
