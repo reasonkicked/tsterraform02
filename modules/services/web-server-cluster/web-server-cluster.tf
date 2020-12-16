@@ -1,8 +1,38 @@
+resource "aws_iam_role" "iam_role_s3_full_access" {
+  name = "iam_role_s3_full_access"
+
+ assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "",
+      "Effect": "Allow",
+      "Principal": {
+        "Service": [
+          "ec2.amazonaws.com"
+        ]
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+EOF
+}
+resource "aws_iam_role_policy_attachment" "ec2-read-only-policy-attachment" {
+    role = aws_iam_role.iam_role_s3_full_access.id
+    policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+}
+resource "aws_iam_instance_profile" "iam_role_s3_instance_profile_s3" {
+  name  = "iam_role_s3_instance_profile_s3"
+  role = aws_iam_role.iam_role_s3_full_access.id
+}
 
 resource "aws_launch_configuration" "asglc_01" {
   image_id        = var.instance_ami
   instance_type   = var.instance_type
   security_groups = var.security_groups_for_ec2
+  iam_instance_profile = "iam_role_s3_instance_profile_s3"
   //iam_instance_profile = "iam_role_s3_instance_profile_s3"
   key_name = var.key_pair_for_ec2 //aws_key_pair.ec2key.key_name
   //data.template_file.user_data.rendered
@@ -29,6 +59,12 @@ resource "aws_autoscaling_group" "asg_01" {
   max_size = var.max_size
   //target_group_arns = var.target_group_arns
   health_check_grace_period = var.health_check_grace_period 
+    
+  tag {
+    key                 = "Name"
+    value               = "${var.prefix}-${terraform.workspace}-asg_01"
+        propagate_at_launch = true
+  }
 
 }
 

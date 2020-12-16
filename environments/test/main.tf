@@ -54,8 +54,8 @@ module "web_server_cluster_01" {
 
 
   asg_subnets_ids_list = [
-      module.network.subnet_01_id,
-      module.network.subnet_02_id
+      module.network.subnet_03_id,
+      module.network.subnet_04_id
   ]
 
   //alb

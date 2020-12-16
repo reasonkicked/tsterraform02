@@ -2,6 +2,7 @@ resource "aws_instance" "ec2_instance" {
   ami           = var.instance_ami
   instance_type = var.instance_type
  // iam_instance_profile = "iam_role_s3_instance_profile_s3"
+ iam_instance_profile = "iam_role_s3_instance_profile_s3"
  
       //user_data = var.user_data_script
     //user_data = data.template_file.user_data.rendered
@@ -10,7 +11,7 @@ resource "aws_instance" "ec2_instance" {
 yum update -y
 yum install httpd php php-mysql -y
 cd /var/www/html
-echo "healthy" > healthy.html
+echo "healthydd" > healthy.html
 wget https://wordpress.org/wordpress-5.1.1.tar.gz
 tar -xzf wordpress-5.1.1.tar.gz
 cp -r wordpress/* /var/www/html/

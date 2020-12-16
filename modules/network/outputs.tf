@@ -40,5 +40,5 @@ output "security_group_03_id" {
 }
 output "security_group_04_id" {
   description = "Id of security_group_04"
-  value       = aws_security_group.security_group_01.id
+  value       = aws_security_group.security_group_04.id
 }
