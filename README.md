@@ -11,5 +11,5 @@ Modules:
 How to run:
 1. run modules network, cdn, ec2, ec2-key-pair
 2. configure ec2 connection between RDS and CDN (instructions in projekt.docx) for read node
-3. make AMI from ec2 and use this AMI for launching web-server-cluster module
+3. make AMI of configured ec2 instance and use this AMI for launching web-server-cluster module
 4. run additional setup from project.docx for write node
