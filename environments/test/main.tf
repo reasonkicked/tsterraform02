@@ -15,7 +15,18 @@ module "ec2_key_pair_01" {
     name_of_key = "ec2_key_pair_01"
   public_key_path = "~/.ssh/id_rsa.pub"
 }
+module "cloudfront_oai_wp_01" {
+  //for later purposes
+  source = "../../modules/data-stores/cdn/cloudfront_oai_wp_01"
+}
 
+module "cdn_01" {
+  source = "../../modules/data-stores/cdn"
+  //depends_on = [ module.cloudfront_oai_wp_01 ]
+  //oai_id = "origin-access-identity/cloudfront/
+  prefix    = var.prefix  
+  environment_tag = var.environment_tag
+}
 
 module "ec2_write_node_primary" {
     depends_on = [ module.network, module.ec2_key_pair_01, module.cdn_01 ]
@@ -27,7 +38,8 @@ module "ec2_write_node_primary" {
     key_pair_for_ec2 = module.ec2_key_pair_01.key_pair_name
     security_groups_for_ec2 = [
         module.network.security_group_01_id,
-        module.network.security_group_02_id
+        module.network.security_group_02_id,
+        module.network.security_group_03_id
   ]
     
     project_name = var.project_name
@@ -35,18 +47,34 @@ module "ec2_write_node_primary" {
     owner_tag = var.owner_tag
     prefix    = var.prefix 
 }
-/*
+
+
+module "rds_db_instance_01" {
+  source = "../../modules/data-stores/rds-db-instance"
+  depends_on = [ module.network ]
+  subnets_ids_list = [
+    module.network.subnet_05_id,
+    module.network.subnet_06_id]
+  security_groups_ids_list = [
+    module.network.security_group_04_id
+  ]
+  environment_tag = var.environment_tag
+  prefix    = var.prefix  
+}
+
+
 module "web_server_cluster_01" {
     source = "../../modules/services/web-server-cluster"
      depends_on = [ module.network, module.ec2_key_pair_01, module.cdn_01, module.ec2_write_node_primary]
 
     //launch configuration
-    instance_ami = "ami-0e472933a1395e172" //custom read node ami
+    instance_ami = "ami-054f7ca3cfeb1adb3" //custom read node ami
     instance_type = "t2.micro"
     key_pair_for_ec2 = module.ec2_key_pair_01.key_pair_name
     security_groups_for_ec2 = [
     module.network.security_group_01_id,
-    module.network.security_group_02_id
+    module.network.security_group_02_id,
+    module.network.security_group_03_id
   ]
   //asg
   min_size = 3
@@ -67,7 +95,8 @@ module "web_server_cluster_01" {
     module.network.subnet_02_id
   ]
   load_balancer_security_groups    = [
-    module.network.security_group_02_id
+    module.network.security_group_02_id,
+    module.network.security_group_03_id
   ]
 
 
@@ -93,28 +122,6 @@ module "web_server_cluster_01" {
     owner_tag = var.owner_tag
     prefix    = var.prefix 
 }
-*/
-module "rds_db_instance_01" {
-  source = "../../modules/data-stores/rds-db-instance"
-  depends_on = [ module.network ]
-  subnets_ids_list = [
-    module.network.subnet_05_id,
-    module.network.subnet_06_id]
-  security_groups_ids_list = [
-    module.network.security_group_04_id
-  ]
-  environment_tag = var.environment_tag
-  prefix    = var.prefix  
-}
 
-module "cloudfront_oai_wp_01" {
-  //for later purposes
-  source = "../../modules/data-stores/cdn/cloudfront_oai_wp_01"
-}
-module "cdn_01" {
-  source = "../../modules/data-stores/cdn"
-  //depends_on = [ module.cloudfront_oai_wp_01 ]
-  //oai_id = "origin-access-identity/cloudfront/
-  prefix    = var.prefix  
-  environment_tag = var.environment_tag
-}
+
+

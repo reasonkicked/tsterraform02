@@ -42,6 +42,12 @@ output "security_group_04_id" {
   description = "Id of security_group_04"
   value       = module.network.security_group_04_id
 }
+
 output "ec2_instance_id" {
   value = module.ec2_write_node_primary.ec2_instance_id
+}
+
+
+output "s3_distribution_domain_name" {
+  value = module.cdn_01.s3_distribution_domain_name
 }

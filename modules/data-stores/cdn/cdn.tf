@@ -1,6 +1,6 @@
 resource "aws_s3_bucket" "s3-wp-code-ts" {
   bucket = "s3-wp-code-ts"
-
+  force_destroy = true
   lifecycle {
     prevent_destroy = false
   }
@@ -23,7 +23,7 @@ resource "aws_s3_bucket" "s3-wp-code-ts" {
 }
 resource "aws_s3_bucket" "s3-wp-media-ts" {
   bucket = "s3-wp-media-ts"
-
+  force_destroy = true
   lifecycle {
     prevent_destroy = false
   }

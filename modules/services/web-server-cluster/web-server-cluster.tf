@@ -12,7 +12,7 @@ resource "aws_launch_configuration" "asglc_01" {
  user_data = <<-EOF
 #!/bin/bash
 yum update -y
-
+aws s3 sync --delete s3://s3-wp-code-ts /var/www/html
 EOF
   lifecycle {
   create_before_destroy = true
@@ -55,6 +55,7 @@ resource "aws_lb" "alb_01" {
 resource "aws_lb_listener" "alb_listener_http" {
   depends_on = [aws_lb.alb_01]
   load_balancer_arn = aws_lb.alb_01.arn
+ // certificate_arn = "arn:aws:acm:us-west-2:890769921003:certificate/1cc532a1-baf4-4579-83e6-93ffba1c2b3f"
   port              = 80
   protocol          = "HTTP"
 
@@ -91,6 +92,33 @@ resource "aws_lb_target_group" "alb_tg_01" {
     Name = "${var.prefix}-${terraform.workspace}-albtg01"
   }
 }
+
+
+
+resource "aws_lb_listener_rule" "alb_lr_01" {
+  depends_on = [
+    aws_lb_listener.alb_listener_http,
+    aws_lb_target_group.alb_tg_01
+    ]
+  listener_arn = aws_lb_listener.alb_listener_http.arn
+  priority     = 100
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.alb_tg_01.arn
+  
+  }
+ 
+  condition {
+      path_pattern {
+      values = ["/*"]
+    }
+    
+ }
+  
+
+}
+/*
 resource "aws_lb_target_group" "alb_tg_02" {
   depends_on = [aws_lb_listener.alb_listener_http]
   name     = "albtg-wn"
@@ -111,29 +139,6 @@ resource "aws_lb_target_group" "alb_tg_02" {
     Environment = var.environment_tag
     Name = "${var.prefix}-${terraform.workspace}-albtg02"
   }
-}
-
-resource "aws_lb_listener_rule" "alb_lr_01" {
-  depends_on = [
-    aws_lb_listener.alb_listener_http,
-    aws_lb_target_group.alb_tg_01
-    ]
-  listener_arn = aws_lb_listener.alb_listener_http.arn
-  priority     = 100
-
-  action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.alb_tg_01.arn
-  }
- 
-  condition {
-      path_pattern {
-      values = ["/index.html*", "/"]
-    }
-    
- }
-  
-
 }
 resource "aws_lb_listener_rule" "alb_lr_02" {
   depends_on = [
@@ -157,8 +162,10 @@ resource "aws_lb_listener_rule" "alb_lr_02" {
 
 }
 
+
 resource "aws_lb_target_group_attachment" "albtg_attachment" {
   target_group_arn = aws_lb_target_group.alb_tg_02.arn
   target_id        = var.target_id
   
 }
+*/
