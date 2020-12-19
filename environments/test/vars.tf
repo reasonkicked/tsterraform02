@@ -1,4 +1,9 @@
 
+variable "region"{
+  type = string
+  default = "us-west-2"
+}
+
 variable "environment_tag" {
   description = "Environment"
     type = string
@@ -15,4 +20,10 @@ variable "prefix" {
 variable "project_name" {
   description = "Project name"
   type        = string
+}
+variable "code_s3_name" {
+  type = string
+}
+variable "media_s3_name" {
+  type = string
 }

@@ -1,5 +1,5 @@
-resource "aws_s3_bucket" "s3-wp-code-ts" {
-  bucket = "s3-wp-code-ts"
+resource "aws_s3_bucket" "s3-bucket-01" {
+  bucket = var.code_s3_name
   force_destroy = true
   lifecycle {
     prevent_destroy = false
@@ -21,8 +21,8 @@ resource "aws_s3_bucket" "s3-wp-code-ts" {
     Name = "${var.prefix}-${terraform.workspace}-s3-wp-code-ts"
   }
 }
-resource "aws_s3_bucket" "s3-wp-media-ts" {
-  bucket = "s3-wp-media-ts"
+resource "aws_s3_bucket" "s3-bucket-02" {
+  bucket = var.media_s3_name
   force_destroy = true
   lifecycle {
     prevent_destroy = false
@@ -64,8 +64,8 @@ POLICY
 resource "aws_cloudfront_distribution" "s3_distribution" {
 //depends_on = [ aws_cloudfront_origin_access_identity.cloudfront_oai_wp_01 ]
   origin {
-    domain_name = "s3-wp-media-ts.s3.amazonaws.com"
-    origin_id   = "s3-wp-media-ts" //local.s3_origin_id
+    domain_name = "${var.media_s3_name}.s3.amazonaws.com"
+    origin_id   = var.media_s3_name //local.s3_origin_id
   /*
     s3_origin_config {
       origin_access_identity = "cloudfront_oai_wp_01"
@@ -88,7 +88,7 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
   default_cache_behavior {
     allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
     cached_methods   = ["GET", "HEAD"]
-    target_origin_id = "s3-wp-media-ts"
+    target_origin_id = var.media_s3_name
 
     forwarded_values {
       query_string = false
@@ -110,7 +110,7 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
     path_pattern     = "/content/immutable/*"
     allowed_methods  = ["GET", "HEAD", "OPTIONS"]
     cached_methods   = ["GET", "HEAD", "OPTIONS"]
-    target_origin_id = "s3-wp-media-ts"
+    target_origin_id = var.media_s3_name
 
     forwarded_values {
       query_string = false
@@ -133,7 +133,7 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
     path_pattern     = "/content/*"
     allowed_methods  = ["GET", "HEAD", "OPTIONS"]
     cached_methods   = ["GET", "HEAD"]
-    target_origin_id = "s3-wp-media-ts"
+    target_origin_id = var.media_s3_name
 
     forwarded_values {
       query_string = false

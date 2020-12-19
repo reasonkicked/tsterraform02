@@ -1,7 +1,3 @@
-provider "aws" {
- region = "us-west-2"
-}
-
 module "network" {
     source = "../../modules/network"
      
@@ -26,6 +22,8 @@ module "cdn_01" {
   //oai_id = "origin-access-identity/cloudfront/
   prefix    = var.prefix  
   environment_tag = var.environment_tag
+  media_s3_name = var.media_s3_name
+  code_s3_name = var.code_s3_name
 }
 
 module "ec2_write_node_primary" {
@@ -68,7 +66,7 @@ module "web_server_cluster_01" {
      depends_on = [ module.network, module.ec2_key_pair_01, module.cdn_01, module.ec2_write_node_primary]
 
     //launch configuration
-    instance_ami = "ami-054f7ca3cfeb1adb3" //custom read node ami
+    instance_ami = "ami-016331a725db7fb72" //custom read node ami
     instance_type = "t2.micro"
     key_pair_for_ec2 = module.ec2_key_pair_01.key_pair_name
     security_groups_for_ec2 = [
@@ -122,6 +120,3 @@ module "web_server_cluster_01" {
     owner_tag = var.owner_tag
     prefix    = var.prefix 
 }
-
-
-

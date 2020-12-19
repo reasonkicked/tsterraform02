@@ -45,12 +45,23 @@ resource "aws_lb" "alb_01" {
   load_balancer_type = var.load_balancer_type
   subnets            = var.load_balancer_subnets
   security_groups    = var.load_balancer_security_groups
+   
    tags = {
     Environment = var.environment_tag
     Name = "${var.prefix}-${terraform.workspace}-alb01"
   }
 }
+resource "aws_route53_record" "www" {
+  zone_id = "Z1FXHS0ZDJ81OO" //pgssandbox.com zone
+  name    = "tsterraform02.pgssandbox.com"
+  type    = "A"
 
+  alias {
+    name                   = aws_lb.alb_01.dns_name
+    zone_id                = aws_lb.alb_01.zone_id
+    evaluate_target_health = true
+  }
+}
 
 resource "aws_lb_listener" "alb_listener_http" {
   depends_on = [aws_lb.alb_01]
@@ -101,7 +112,7 @@ resource "aws_lb_listener_rule" "alb_lr_01" {
     aws_lb_target_group.alb_tg_01
     ]
   listener_arn = aws_lb_listener.alb_listener_http.arn
-  priority     = 100
+  priority     = 101
 
   action {
     type             = "forward"
@@ -127,7 +138,7 @@ resource "aws_lb_target_group" "alb_tg_02" {
   vpc_id   = var.vpc_id
 
   health_check {
-    path                = "/"
+    path                = "/wp-admin/"
     protocol            = "HTTP"
     matcher             = "200"
     interval            = 15
@@ -146,7 +157,7 @@ resource "aws_lb_listener_rule" "alb_lr_02" {
     aws_lb_target_group.alb_tg_02
     ]
   listener_arn = aws_lb_listener.alb_listener_http.arn
-  priority     = 101
+  priority     = 100
 
   action {
     type             = "forward"
@@ -155,7 +166,7 @@ resource "aws_lb_listener_rule" "alb_lr_02" {
  
   condition {
       path_pattern {
-      values = ["/wp-admin*"]
+      values = ["/wp-admin/*"]
     }
     
  }
