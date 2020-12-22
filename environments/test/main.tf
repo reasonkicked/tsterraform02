@@ -63,10 +63,10 @@ module "rds_db_instance_01" {
 
 module "web_server_cluster_01" {
     source = "../../modules/services/web-server-cluster"
-     depends_on = [ module.network, module.ec2_key_pair_01, module.cdn_01, module.ec2_write_node_primary]
+    depends_on = [ module.network, module.ec2_key_pair_01, module.cdn_01, module.ec2_write_node_primary]
 
     //launch configuration
-    instance_ami = "ami-016331a725db7fb72" //custom read node ami
+    instance_ami = "ami-0fd6e421ea040d53e" //custom read node ami
     instance_type = "t2.micro"
     key_pair_for_ec2 = module.ec2_key_pair_01.key_pair_name
     security_groups_for_ec2 = [

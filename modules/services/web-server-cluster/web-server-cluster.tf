@@ -1,5 +1,4 @@
 
-
 resource "aws_launch_configuration" "asglc_01" {
   image_id        = var.instance_ami
   instance_type   = var.instance_type
@@ -63,12 +62,30 @@ resource "aws_route53_record" "www" {
   }
 }
 
+resource "aws_lb_listener" "alb_listener_http_80" {
+  depends_on = [aws_lb.alb_01]
+  load_balancer_arn = aws_lb.alb_01.arn
+  port              = 80
+  protocol          = "HTTP"
+
+  # By default, return a simple 404 page
+   default_action {
+    type = "redirect"
+
+    redirect {
+      port        = "443"
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
+    }
+  }
+}
+
 resource "aws_lb_listener" "alb_listener_http" {
   depends_on = [aws_lb.alb_01]
   load_balancer_arn = aws_lb.alb_01.arn
- // certificate_arn = "arn:aws:acm:us-west-2:890769921003:certificate/1cc532a1-baf4-4579-83e6-93ffba1c2b3f"
-  port              = 80
-  protocol          = "HTTP"
+  certificate_arn = "arn:aws:acm:us-west-2:890769921003:certificate/e9e60fde-8d03-4601-a1c2-e1218a0e5cd7"
+  port              = 443
+  protocol          = "HTTPS"
 
   # By default, return a simple 404 page
   default_action {
@@ -81,6 +98,7 @@ resource "aws_lb_listener" "alb_listener_http" {
     }
   }
 }
+
 
 resource "aws_lb_target_group" "alb_tg_01" {
   depends_on = [aws_lb_listener.alb_listener_http]
@@ -129,16 +147,16 @@ resource "aws_lb_listener_rule" "alb_lr_01" {
   
 
 }
-/*
+
 resource "aws_lb_target_group" "alb_tg_02" {
-  depends_on = [aws_lb_listener.alb_listener_http]
+  //depends_on = [aws_lb_listener.alb_listener_http]
   name     = "albtg-wn"
   port     = 80
   protocol = "HTTP"
   vpc_id   = var.vpc_id
 
   health_check {
-    path                = "/wp-admin/"
+    path                = "/"
     protocol            = "HTTP"
     matcher             = "200"
     interval            = 15
@@ -151,6 +169,7 @@ resource "aws_lb_target_group" "alb_tg_02" {
     Name = "${var.prefix}-${terraform.workspace}-albtg02"
   }
 }
+
 resource "aws_lb_listener_rule" "alb_lr_02" {
   depends_on = [
     aws_lb_listener.alb_listener_http,
@@ -166,7 +185,7 @@ resource "aws_lb_listener_rule" "alb_lr_02" {
  
   condition {
       path_pattern {
-      values = ["/wp-admin/*"]
+      values = ["/wp-admin/, /wp-admin*"]
     }
     
  }
@@ -177,6 +196,4 @@ resource "aws_lb_listener_rule" "alb_lr_02" {
 resource "aws_lb_target_group_attachment" "albtg_attachment" {
   target_group_arn = aws_lb_target_group.alb_tg_02.arn
   target_id        = var.target_id
-  
 }
-*/
