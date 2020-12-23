@@ -185,7 +185,7 @@ resource "aws_lb_listener_rule" "alb_lr_02" {
  
   condition {
       path_pattern {
-      values = ["/wp-admin/, /wp-admin*"]
+      values = ["/wp-admin/*", "/index.php/wp-json/*"]
     }
     
  }
